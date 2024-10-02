@@ -6,9 +6,7 @@
  */
 package com.farao_community.farao.rao_failure_handler;
 
-import org.springframework.amqp.core.FanoutExchange;
 import org.springframework.amqp.core.Queue;
-import org.springframework.amqp.core.QueueBuilder;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.listener.MessageListenerContainer;
 import org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer;
@@ -28,9 +26,9 @@ public class AmqpBeans {
 
     @Bean
     public Queue raoRequestQueue() {
-        final QueueBuilder queueBuilder = QueueBuilder.durable(amqpConfiguration.raoRequest().queueName());
-        queueBuilder.deliveryLimit(amqpConfiguration.raoRequest().deliveryLimit());
-        return queueBuilder.quorum().build();
+        return new Queue(amqpConfiguration.raoRequest().queueName());
+//        return QueueBuilder.durable(amqpConfiguration.raoRequest().queueName())
+//                .quorum().build();
     }
 
     @Bean
@@ -41,11 +39,5 @@ public class AmqpBeans {
         simpleMessageListenerContainer.setMessageListener(listener);
         simpleMessageListenerContainer.setPrefetchCount(1);
         return simpleMessageListenerContainer;
-    }
-
-    // TODO Ensure this bean is necessary (as it is not used in the code except to retrieve the name of the exchange)
-    @Bean
-    public FanoutExchange raoResponseExchange() {
-        return new FanoutExchange(amqpConfiguration.raoResponse().exchange());
     }
 }

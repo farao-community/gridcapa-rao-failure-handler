@@ -13,7 +13,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  */
 @ConfigurationProperties("rao-failure-handler.messages")
 public record AmqpConfiguration(RaoRequestConfiguration raoRequest, RaoResponseConfiguration raoResponse) {
-    public record RaoRequestConfiguration(String queueName, int deliveryLimit) {
+    public record RaoRequestConfiguration(String queueName) {
     }
     public record RaoResponseConfiguration(String exchange, String expiration) {
     }

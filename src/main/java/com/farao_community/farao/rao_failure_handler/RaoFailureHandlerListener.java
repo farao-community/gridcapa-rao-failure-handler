@@ -12,7 +12,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 import org.springframework.amqp.core.AmqpTemplate;
-import org.springframework.amqp.core.Exchange;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessageBuilder;
 import org.springframework.amqp.core.MessageDeliveryMode;
@@ -39,13 +38,11 @@ public class RaoFailureHandlerListener implements MessageListener {
     private final Logger businessLogger;
     private final JsonApiConverter jsonApiConverter;
     private final AmqpConfiguration amqpConfiguration;
-    private final Exchange raoResponseExchange;
 
-    public RaoFailureHandlerListener(AmqpTemplate amqpTemplate, Logger businessLogger, AmqpConfiguration amqpConfiguration, Exchange raoResponseExchange) {
+    public RaoFailureHandlerListener(AmqpTemplate amqpTemplate, Logger businessLogger, AmqpConfiguration amqpConfiguration) {
         this.amqpTemplate = amqpTemplate;
         this.businessLogger = businessLogger;
         this.amqpConfiguration = amqpConfiguration;
-        this.raoResponseExchange = raoResponseExchange;
         this.jsonApiConverter = new JsonApiConverter();
     }
 
@@ -83,7 +80,7 @@ public class RaoFailureHandlerListener implements MessageListener {
         if (replyTo != null) {
             amqpTemplate.send(replyTo, errorResponse);
         } else {
-            amqpTemplate.send(raoResponseExchange.getName(), "", errorResponse);
+            amqpTemplate.send(amqpConfiguration.raoResponse().exchange(), "", errorResponse);
         }
     }
 

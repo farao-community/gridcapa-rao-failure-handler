@@ -25,7 +25,6 @@ class AmqpConfigurationTest {
         Assertions.assertThat(amqpConfiguration).isNotNull();
         Assertions.assertThat(amqpConfiguration.raoRequest()).isNotNull();
         Assertions.assertThat(amqpConfiguration.raoRequest().queueName()).isEqualTo("raoi-request-queue");
-        Assertions.assertThat(amqpConfiguration.raoRequest().deliveryLimit()).isEqualTo(2);
         Assertions.assertThat(amqpConfiguration.raoResponse()).isNotNull();
         Assertions.assertThat(amqpConfiguration.raoResponse().exchange()).isEqualTo("raoi-response");
         Assertions.assertThat(amqpConfiguration.raoResponse().expiration()).isEqualTo("60000");
