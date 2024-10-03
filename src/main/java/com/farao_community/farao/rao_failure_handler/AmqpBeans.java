@@ -27,8 +27,6 @@ public class AmqpBeans {
     @Bean
     public Queue raoRequestQueue() {
         return new Queue(amqpConfiguration.raoRequest().queueName());
-//        return QueueBuilder.durable(amqpConfiguration.raoRequest().queueName())
-//                .quorum().build();
     }
 
     @Bean
