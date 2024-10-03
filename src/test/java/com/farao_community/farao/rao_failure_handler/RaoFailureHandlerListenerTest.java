@@ -24,10 +24,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
+import java.util.Map;
 import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
 
 /**
  * @author Vincent Bochet {@literal <vincent.bochet at rte-france.com>}
@@ -50,11 +48,14 @@ class RaoFailureHandlerListenerTest {
         logger.addAppender(listAppender);
         listener.addMetaDataToLogsModelContext("process-id", "request-id", "client-id", Optional.of("prefix"));
         logger.info("message");
-        assertEquals(4, listAppender.list.get(0).getMDCPropertyMap().size());
-        assertEquals("process-id", listAppender.list.get(0).getMDCPropertyMap().get("gridcapaTaskId"));
-        assertEquals("request-id", listAppender.list.get(0).getMDCPropertyMap().get("computationId"));
-        assertEquals("client-id", listAppender.list.get(0).getMDCPropertyMap().get("clientAppId"));
-        assertEquals("prefix", listAppender.list.get(0).getMDCPropertyMap().get("eventPrefix"));
+
+        final Map<String, String> mdcPropertyMap = listAppender.list.get(0).getMDCPropertyMap();
+        Assertions.assertThat(mdcPropertyMap)
+                .hasSize(4)
+                .containsEntry("gridcapaTaskId", "process-id")
+                .containsEntry("computationId", "request-id")
+                .containsEntry("clientAppId", "client-id")
+                .containsEntry("eventPrefix", "prefix");
     }
 
     @Test
@@ -65,11 +66,14 @@ class RaoFailureHandlerListenerTest {
         logger.addAppender(listAppender);
         listener.addMetaDataToLogsModelContext("process-id", "request-id", "client-id", Optional.empty());
         logger.info("message");
-        assertEquals(3, listAppender.list.get(0).getMDCPropertyMap().size());
-        assertEquals("process-id", listAppender.list.get(0).getMDCPropertyMap().get("gridcapaTaskId"));
-        assertEquals("request-id", listAppender.list.get(0).getMDCPropertyMap().get("computationId"));
-        assertEquals("client-id", listAppender.list.get(0).getMDCPropertyMap().get("clientAppId"));
-        assertNull(listAppender.list.get(0).getMDCPropertyMap().get("eventPrefix"));
+
+        final Map<String, String> mdcPropertyMap = listAppender.list.get(0).getMDCPropertyMap();
+        Assertions.assertThat(mdcPropertyMap)
+                .hasSize(3)
+                .containsEntry("gridcapaTaskId", "process-id")
+                .containsEntry("computationId", "request-id")
+                .containsEntry("clientAppId", "client-id")
+                .doesNotContainKey("eventPrefix");
     }
 
     @Test
