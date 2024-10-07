@@ -1,0 +1,11 @@
+spring:
+  application:
+    name: rao-failure-handler
+
+rao-failure-handler:
+  messages:
+    rao-request:
+      queue-name: rao-request-queue.dlq
+    rao-response:
+      exchange: rao-response
+      expiration: 600000 # (10x60s), time for applications to read the response
