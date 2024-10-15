@@ -32,7 +32,7 @@
 
     <properties>
         <logstash.version>7.0.1</logstash.version>
-        <gridcapa-rao-runner-api.version>1.26.0</gridcapa-rao-runner-api.version>
+        <gridcapa-rao-runner-api.version>1.27.0-SNAPSHOT</gridcapa-rao-runner-api.version>
     </properties>
 
     <build>
