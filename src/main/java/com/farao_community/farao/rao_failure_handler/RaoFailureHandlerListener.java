@@ -7,6 +7,7 @@
 package com.farao_community.farao.rao_failure_handler;
 
 import com.farao_community.farao.rao_runner.api.JsonApiConverter;
+import com.farao_community.farao.rao_runner.api.resource.RaoFailureResponse;
 import com.farao_community.farao.rao_runner.api.resource.RaoRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,7 +21,6 @@ import org.springframework.amqp.core.MessageProperties;
 import org.springframework.amqp.core.MessagePropertiesBuilder;
 import org.springframework.stereotype.Component;
 
-import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 
 /**
@@ -56,9 +56,9 @@ public class RaoFailureHandlerListener implements MessageListener {
             LOGGER.info("Failed RAO request received from DLQ: {}", raoRequest);
             addMetaDataToLogsModelContext(raoRequest.getId(), brokerCorrelationId, message.getMessageProperties().getAppId(), raoRequest.getEventPrefix());
             businessLogger.error("The RAO request reached the maximum number of attempts but could not be processed successfully");
-            sendErrorResponse("The RAO request reached the maximum number of attempts but could not be processed successfully", replyTo, brokerCorrelationId);
+            sendRaoFailedResponse(raoRequest.getId(), "The RAO request reached the maximum number of attempts but could not be processed successfully", replyTo, brokerCorrelationId);
         } catch (Exception e) {
-            sendErrorResponse("Unhandled exception: " + e.getMessage(), replyTo, brokerCorrelationId);
+            sendRaoFailedResponse("defaultId", "Unhandled exception: " + e.getMessage(), replyTo, brokerCorrelationId);
         }
     }
 
@@ -73,26 +73,39 @@ public class RaoFailureHandlerListener implements MessageListener {
         }
     }
 
-    private void sendErrorResponse(final String errorMessageText, final String replyTo, final String correlationId) {
-        final byte[] errorMessageJson = errorMessageText.getBytes(StandardCharsets.UTF_8);
-        final MessageProperties messageProperties = buildMessageResponseProperties(correlationId);
-        final Message errorResponse = MessageBuilder.withBody(errorMessageJson).andProperties(messageProperties).build();
+    private void sendRaoFailedResponse(final String id, final String errorMessage, final String replyTo, final String correlationId) {
+        final RaoFailureResponse response = new RaoFailureResponse.Builder()
+                .withId(id)
+                .withErrorMessage(errorMessage)
+                .build();
+        final Message responseMessage = MessageBuilder.withBody(jsonApiConverter.toJsonMessage(response))
+                .andProperties(buildMessageResponseProperties(correlationId, response.isRaoFailed()))
+                .build();
+        sendMessage(replyTo, responseMessage);
+    }
+
+    private void sendMessage(final String replyTo, final Message responseMessage) {
         if (replyTo != null) {
-            amqpTemplate.send(replyTo, errorResponse);
+            amqpTemplate.send(replyTo, responseMessage);
         } else {
-            amqpTemplate.send(amqpConfiguration.raoResponse().exchange(), "", errorResponse);
+            amqpTemplate.send(amqpConfiguration.raoResponse().exchange(), "", responseMessage);
+        }
+
+        if (LOGGER.isInfoEnabled()) {
+            LOGGER.info("Response message: {}", new String(responseMessage.getBody()));
         }
     }
 
-    private MessageProperties buildMessageResponseProperties(final String correlationId) {
+    private MessageProperties buildMessageResponseProperties(final String correlationId, final boolean failed) {
         return MessagePropertiesBuilder.newInstance()
-            .setAppId(APPLICATION_ID)
-            .setContentEncoding(CONTENT_ENCODING)
-            .setContentType(CONTENT_TYPE)
-            .setCorrelationId(correlationId)
-            .setDeliveryMode(MessageDeliveryMode.NON_PERSISTENT)
-            .setExpiration(amqpConfiguration.raoResponse().expiration())
-            .setPriority(PRIORITY)
-            .build();
+                .setAppId(APPLICATION_ID)
+                .setContentEncoding(CONTENT_ENCODING)
+                .setContentType(CONTENT_TYPE)
+                .setCorrelationId(correlationId)
+                .setDeliveryMode(MessageDeliveryMode.NON_PERSISTENT)
+                .setExpiration(amqpConfiguration.raoResponse().expiration())
+                .setPriority(PRIORITY)
+                .setHeaderIfAbsent("rao-failure", failed)
+                .build();
     }
 }
