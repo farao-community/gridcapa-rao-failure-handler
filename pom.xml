@@ -11,7 +11,7 @@
     </parent>
 
     <artifactId>gridcapa-rao-failure-handler</artifactId>
-    <version>1.2.0-SNAPSHOT</version>
+    <version>1.2.0</version>
     <name>GridCapa RAO failure handler</name>
     <description>Service responsible for handling failed rao-requests that have been sent to DLQ</description>
 
