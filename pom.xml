@@ -7,7 +7,7 @@
     <parent>
         <groupId>com.farao-community.farao</groupId>
         <artifactId>farao-parent-ws</artifactId>
-        <version>1.10.1</version>
+        <version>1.11.0-SNAPSHOT</version>
     </parent>
 
     <artifactId>gridcapa-rao-failure-handler</artifactId>
@@ -31,7 +31,6 @@
     </developers>
 
     <properties>
-        <logstash.version>7.0.1</logstash.version>
         <gridcapa-rao-runner-api.version>1.30.0</gridcapa-rao-runner-api.version>
     </properties>
 
@@ -50,7 +49,6 @@
         <dependency>
             <groupId>net.logstash.logback</groupId>
             <artifactId>logstash-logback-encoder</artifactId>
-            <version>${logstash.version}</version>
             <scope>runtime</scope>
         </dependency>
         <dependency>
