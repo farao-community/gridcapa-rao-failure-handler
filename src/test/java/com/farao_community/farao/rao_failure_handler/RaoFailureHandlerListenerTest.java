@@ -23,7 +23,7 @@ import org.springframework.amqp.core.MessagePropertiesBuilder;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import java.util.Map;
 import java.util.Optional;
@@ -38,7 +38,7 @@ class RaoFailureHandlerListenerTest {
     @Autowired
     private RaoFailureHandlerListener listener;
 
-    @MockBean
+    @MockitoBean
     private RabbitTemplate amqpTemplate;
 
     @Test
