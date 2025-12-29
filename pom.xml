@@ -7,7 +7,7 @@
     <parent>
         <groupId>com.farao-community.farao</groupId>
         <artifactId>farao-parent-ws</artifactId>
-        <version>1.13.0</version>
+        <version>1.14.0</version>
     </parent>
 
     <artifactId>gridcapa-rao-failure-handler</artifactId>
@@ -32,7 +32,7 @@
 
     <properties>
         <argLine /> <!-- required for java agent declaration, do not remove -->
-        <gridcapa-rao-runner-api.version>1.30.0</gridcapa-rao-runner-api.version>
+        <gridcapa-rao-runner-api.version>1.42.0</gridcapa-rao-runner-api.version>
     </properties>
 
     <build>
